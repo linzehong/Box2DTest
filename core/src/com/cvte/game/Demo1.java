@@ -24,10 +24,15 @@ public class Demo1 extends ApplicationAdapter {
 	private Box2DDebugRenderer mRenderer;
 	
 	private World mWorld;
+	
+	private Body mGound;
 	private Body mBall;
 	
-	private Texture mTextureBall;
 	private SpriteBatch mBatch;
+	
+	private Texture mTextureBG;
+	private Texture mTextureGround;
+	private Texture mTextureBall;
 	
 	private float mBallRadius;
 	
@@ -50,13 +55,16 @@ public class Demo1 extends ApplicationAdapter {
 			bd.position.set(toWorldSize(0), toWorldSize(100));
 			
 			EdgeShape edgeShape = new EdgeShape();
-			edgeShape.set(new Vector2(toWorldSize(0), toWorldSize(80)), new Vector2(toWorldSize(Gdx.graphics.getWidth()), toWorldSize(80)));
+			edgeShape.set(new Vector2(toWorldSize(0), toWorldSize(0)), new Vector2(toWorldSize(Gdx.graphics.getWidth()), toWorldSize(0)));
 			
 			FixtureDef fd = new FixtureDef();
 			fd.shape = edgeShape;
 						
-			Body ground = mWorld.createBody(bd);
-			ground.createFixture(fd);
+			mGound = mWorld.createBody(bd);
+			mGound.createFixture(fd);
+			
+			mTextureGround = new Texture(Gdx.files.internal("bottom.png"));
+			mGound.setUserData(mTextureGround);
 		}
 		
 		//ball
@@ -81,6 +89,8 @@ public class Demo1 extends ApplicationAdapter {
 			mBall.setUserData(mTextureBall);
 		}
 		
+		mTextureBG = new Texture(Gdx.files.internal("background2.png"));
+		
 		mBatch = new SpriteBatch();
 	}
 
@@ -99,10 +109,12 @@ public class Demo1 extends ApplicationAdapter {
 		
 		mWorld.step(Gdx.app.getGraphics().getDeltaTime(), 6, 2);
 		
-//		mRenderer.render(mWorld, mCamera.combined);
+		mRenderer.render(mWorld, mCamera.combined);
 		
 		mBatch.setProjectionMatrix(mCamera.combined);
 		mBatch.begin();
+		mBatch.draw(mTextureBG, 0, 0, mCamera.viewportWidth, mCamera.viewportHeight);
+		mBatch.draw(mTextureGround, mGound.getPosition().x, 0, mCamera.viewportWidth, mGound.getPosition().y);
 		mBatch.draw(mTextureBall, mBall.getPosition().x - mBallRadius, mBall.getPosition().y - mBallRadius, mBallRadius * 2, mBallRadius * 2);
 		mBatch.end();
 	}
